@@ -37,28 +37,30 @@ vim /etc/ssh/sshd_config
 - Uncomment #PermitRootLogin prohibit-password and replace with No
 - Uncomment #PubkeyAuthentication yes
 3. Now create a new network interface that will link your machine to your host:
-`vim /etc/network/interfaces`
-
+```bash
+vim /etc/network/interfaces
+```
 And add the following content:
 
-`# This file describes the network interfaces available on your system`
-`# and how to activate them. For more information, see interfaces (5).`
+```bash
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces (5).
 
-`source /etc/network/interfaces.d/*`
+source /etc/network/interfaces.d/*
 
-`# The loopback network interface`
-`auto lo`
-i`face lo inet loopback`
+# The loopback network interface
+auto lo
+iface lo inet loopback
 
-`# The primary network interface`
-`allow-hotplug enp0s3`
-`iface enp0s3 inet dhcp`
+# The primary network interface
+allow-hotplug enp0s3
+iface enp0s3 inet dhcp
 
-`allow-hotplug enp0s8`
-`iface enp0s8 inet static`
-`address 192.168.56.3`
-`netmask 255.255.255.252`
-
+allow-hotplug enp0s8
+iface enp0s8 inet static
+address 192.168.56.3
+netmask 255.255.255.252
+```
 4. Create a new user now:
 `adduser <username>`, I used username `newuser`
 5. Enter the info and add it to the sudo group:
