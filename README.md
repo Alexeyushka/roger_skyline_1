@@ -28,7 +28,9 @@ This project, roger-skyline-1 let you install a Virtual Machine, discover the ba
 apt install -y sudo net-tools iptables-persist fail2ban sendmail apache2```
 
 2. Then modify the ssh parameters:
-`vim /etc/ssh/sshd_config`
+```bash
+vim /etc/ssh/sshd_config
+```
 - Change the port to 2222 (for example)
 - Uncomment the #PasswordAuthentification yes line
 - Uncomment #PermitRootLogin prohibit-password and replace with No
