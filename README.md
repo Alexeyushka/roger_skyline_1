@@ -124,7 +124,7 @@ SSL, indicate the correct way of the keys:
 <IfModule mod_ssl.c>
 <VirtualHost _default_: 443>
 Webmaster ServerAdmin @ localhost
-DocumentRoot / var / www / html
+DocumentRoot /var/www/html
 
 ErrorLog $ {APACHE_LOG_DIR} /error.log
 CustomLog $ {APACHE_LOG_DIR} /access.log combined
@@ -185,6 +185,7 @@ systemctl reload apache2
 The site will normally be accessible on your IP (https://192.168.56.3).
 This is a self signed certificate so the browser will warn you before accessing, just skip it.
 
-6. You can file in the `/var/www/html` folder if you have not changed the DocumentRoot.
-
-
+6. You can add files in the folder if you have not changed the DocumentRoot.
+```bash
+/var/www/html
+```
