@@ -25,7 +25,8 @@ This project, roger-skyline-1 let you install a Virtual Machine, discover the ba
 
 1. Install the necessary packages for Roger-Skyline:
 ```bash
-apt install -y sudo net-tools iptables-persist fail2ban sendmail apache2```
+apt install -y sudo net-tools iptables-persist fail2ban sendmail apache2
+```
 
 2. Then modify the ssh parameters:
 ```bash
