@@ -62,84 +62,125 @@ address 192.168.56.3
 netmask 255.255.255.252
 ```
 4. Create a new user now:
-`adduser <username>`, I used username `newuser`
+```bash
+adduser <username>
+```
+I used username `newuser`
 5. Enter the info and add it to the sudo group:
-`adduser <username> sudo`
+```bash
+adduser <username> sudo
+```
 6. Restart the machine now:
-`reboot`
+```bash
+reboot
+```
 7. In a terminal of your host, generate a public ssh key:
-`ssh-keygen`
+```bash
+ssh-keygen
+```
 8. Cat and copy the content
-`cat ~/.ssh/id_rsa.pub`
+```bash
+cat ~/.ssh/id_rsa.pub
+```
 9. Connect now to your machine:
-`ssh <user>@<ip machine> -p <Port>`
+```bash
+ssh <user>@<ip machine> -p <Port>
+```
 in our case use command:
-`ssh newuser@127.0.0.1 -p 2222`
+```bash
+ssh newuser@127.0.0.1 -p 2222
+```
 10. Enter the password, required first time
 11. Create .ssh folder in your user's home:
-`mkdir .ssh`
+```bash
+mkdir .ssh
+```
 12. Open .ssh/authorized_keys and paste the key into the file
-`vim .ssh/authorized_keys`
+```bash
+vim .ssh/authorized_keys
+```
 13. Edit the ssh configuration file (change "PasswordAuthentification "yes" to "no":
-`sudo vim /etc/ssh/sshd_config`
+```bash
+sudo vim /etc/ssh/sshd_config
+```
 14. Restart the ssh service
-`sudo service ssh restart`
+```bash
+sudo service ssh restart
+```
 15. Exit the ssh with exit and retry a connection with the previous command. The connection is now password-free with PublicKeys. You will find your VM in the .ssh / known_hosts file.
 
 ## Web Part <a id="WebPart"></a>
 1. Generate a new SSL key, enter the info when requested.:
-`sudo openssl req -x509 -nodes -days 365 -new keys: 2048 -keyout /etc/ssl/private/roger-skyline.com.key -out /etc/ssl/certs/roger-skyline.com.crt`
+```bash
+sudo openssl req -x509 -nodes -days 365 -new keys: 2048 -keyout /etc/ssl/private/roger-skyline.com.key -out /etc/ssl/certs/roger-skyline.com.crt
+```
 
 2. Then
-`sudo vim /etc/apache2/sites-available/default-ssl.conf`
+```bash
+sudo vim /etc/apache2/sites-available/default-ssl.conf
+```
 SSL, indicate the correct way of the keys:
-`<IfModule mod_ssl.c>`
-`<VirtualHost _default_: 443>`
-`Webmaster ServerAdmin @ localhost`
-`DocumentRoot / var / www / html`
+```bash
+<IfModule mod_ssl.c>
+<VirtualHost _default_: 443>
+Webmaster ServerAdmin @ localhost
+DocumentRoot / var / www / html
 
-`ErrorLog $ {APACHE_LOG_DIR} /error.log`
-`CustomLog $ {APACHE_LOG_DIR} /access.log combined`
+ErrorLog $ {APACHE_LOG_DIR} /error.log
+CustomLog $ {APACHE_LOG_DIR} /access.log combined
 
-`#Include conf-available / serve-cgi-bin.conf`
+#Include conf-available / serve-cgi-bin.conf
 
-`# SSL engine switch:`
-`# Enable / Disable SSL for this virtual host.`
-`SSLEngine on`
-`SSLCertificateFile /etc/ssl/certs/roger-skyline.com.crt`
-`SSLCertificateKeyFile /etc/ssl/private/roger-skyline.com.key`
-`#`
-`#SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem`
-`#SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key`
+# SSL engine switch:
+# Enable / Disable SSL for this virtual host.
+SSLEngine on
+SSLCertificateFile /etc/ssl/certs/roger-skyline.com.crt
+SSLCertificateKeyFile /etc/ssl/private/roger-skyline.com.key
+#
+#SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem
+#SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
 
-`......................`
-`.......................`
+......................
+.......................
 
-`</ VirtualHost>`
-`</ IfModule>`
-
+</ VirtualHost>
+</ IfModule>
+```
 3. Test the following commands:
-`sudo apachectl configtest`
-`sudo a2enmod ssl`
-`sudo a2ensite default-ssl`
-
+```bash
+sudo apachectl configtest
+sudo a2enmod ssl
+sudo a2ensite default-ssl
+```
 if Error occurs:
-`sudo systemctl restart apache2.service`
+```bash
+sudo systemctl restart apache2.service
+```
 
 4. Then make a copy of the default configuration:
-`sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/001-default.conf`
+```bash
+sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/001-default.conf
+```
 
-5. And modify the file south vim /etc/apache2/sites-available/001-default.conf
-
+5. And modify the file south 
+```bash
+vim /etc/apache2/sites-available/001-default.conf
+```
 Change the ServerName by whatever you want and the DocumentRoot by the path to your website.
 Activate the new configuration:
 
-`# Disables the old configuration`
-`a2dissite 000-default.conf`
-`# Active new`
-`a2ensite 001-site.conf`
-`# The command speaks for itself ...`
-`systemctl reload apache2`
+# Disables the old configuration
+```bash
+a2dissite 000-default.conf
+```
+# Active new
+```bash
+a2ensite 001-site.conf
+```
+# The command speaks for itself ...
+```bash
+systemctl reload apache2
+```
 
 The site will normally be accessible on your IP (https://192.168.56.3).
 This is a self signed certificate so the browser will warn you before accessing, just skip it.
