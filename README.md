@@ -5,7 +5,7 @@ This project, roger-skyline-1 let you install a Virtual Machine, discover the ba
 
 - [Summary](#summary)
 - [Virtual Machine Installation](#VMinstall)
-- [OS Installation Process](#SetUpEnvironment)
+- [Set up the Environment](#SetUpEnvironment)
 - [Web Part](#WebPart)
 
 
