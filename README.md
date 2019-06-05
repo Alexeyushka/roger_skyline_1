@@ -109,6 +109,199 @@ sudo service ssh restart
 ```
 15. Exit the ssh with exit and retry a connection with the previous command. The connection is now password-free with PublicKeys. You will find your VM in the .ssh / known_hosts file.
 
+## Setup Firewall with UFW. <a id="ufw"></a>
+
+1. Make sure ufw is enable
+
+```bash
+sudo ufw status
+```
+ if not we can start the service with
+ 
+ ```bash
+ sudo ufw enable
+ ```
+ 
+2. Setup firewall rules
+      - SSH : `sudo ufw allow 50683/tcp`
+      - HTTP : `sudo ufw allow 80/tcp`
+      - HTTPS : `sudo ufw allow 443`
+      
+3. Setup Denial Of Service Attack with fail2ban
+      
+```bash
+sudo vim /etc/fail2ban/jail.conf
+```
+
+```console
+[sshd]
+enabled = true
+port    = 42
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
+maxretry = 3
+bantime = 600
+
+#Add after HTTP servers:
+[http-get-dos]
+enabled = true
+port = http,https
+filter = http-get-dos
+logpath = /var/log/apache2/access.log (le fichier d'access sur server web)
+maxretry = 300
+findtime = 300
+bantime = 600
+action = iptables[name=HTTP, port=http, protocol=tcp]
+```
+
+Add http-get-dos filter
+
+```bash
+sudo cat /etc/fail2ban/filter.d/http-get-dos.conf
+```
+
+Output:
+
+```console
+[Definition]
+failregex = ^<HOST> -.*"(GET|POST).*
+ignoreregex =
+```
+5. Finally we need to reload our firewall and fail2ban
+
+```bash
+sudo ufw reload
+sudo service fail2ban restart
+```
+
+## Protection against port scans. <a id="scanSecure"></a>
+
+1. Config portsentry
+
+First, we have to edit the `/etc/default/portsentry` file
+
+```console
+TCP_MODE="atcp"
+UDP_MODE="audp"
+```
+
+After, edit the file `/etc/portsentry/portsentry.conf`
+
+```console
+BLOCK_UDP="1"
+BLOCK_TCP="1"
+```
+
+Comment the current KILL_ROUTE and uncomment the following one:
+
+```console
+KILL_ROUTE="/sbin/iptables -I INPUT -s $TARGET$ -j DROP"
+```
+
+Comment the following line:
+
+```console
+KILL_HOSTS_DENY="ALL: $TARGET$ : DENY
+```
+
+2. We can now restart the service to make changes effectives
+
+```bash
+sudo service portsentry restart
+```
+
+## Stop the services we don’t need <a id="stopServices"></a>
+
+```bash
+sudo systemctl disable console-setup.service
+sudo systemctl disable keyboard-setup.service
+sudo systemctl disable apt-daily.timer
+sudo systemctl disable apt-daily-upgrade.timer
+sudo systemctl disable syslog.service
+```
+
+## Update Packages <a id="updateApt"></a>
+
+1. Create the `update.sh` file and write the following lines inside
+
+```bash
+echo "sudo apt-get update -y >> /var/log/update_script.log" >> ~/update.sh
+echo "sudo apt-get upgrade -y >> /var/log/update_script.log" >> ~/update.sh
+```
+
+2. Add the task to cron
+
+```bash
+sudo crontab -e
+```
+
+3. Write in the openned file thoses lines
+
+```bash
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+@reboot sudo ~/update.sh
+0 4 * * 6 sudo ~/update.sh
+```
+
+## Monitor Crontab Changes <a id="cronChange"></a>
+
+1. Create the `cronMonitor.sh` file and write the following lines inside
+
+```console
+gde@roger-skyline-1:~$ cat ~/cronMonitor.sh
+#!/bin/bash
+
+FILE="/var/tmp/checksum"
+FILE_TO_WATCH="/var/spool/cron/crontabs/gde"
+MD5VALUE=$(sudo md5sum $FILE_TO_WATCH)
+
+if [ ! -f $FILE ]
+then
+	 echo "$MD5VALUE" > $FILE
+	 exit 0;
+fi;
+
+if [ "$MD5VALUE" != "$(cat $FILE)" ];
+	then
+	echo "$MD5VALUE" > $FILE
+	echo "$FILE_TO_WATCH has been modified ! '*_*" | mail -s "$FILE_TO_WATCH modified !" root
+fi;
+```
+
+2. Add the task to cron
+
+```bash
+crontab -e
+```
+
+3. Write in the openned file thoses lines
+
+```bash
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+@reboot sudo ~/update.sh
+0 4 * * 6 sudo ~/update.sh
+0 0 * * * sudo ~/cronMonitor.sh
+```
+
+4. Make sure we have correct rights
+
+```bash
+sudo chmod 755 cronMonitor.sh
+sudo chmod 755 update.sh
+sudo chown newuser /var/mail/newuser
+```
+
+5. make sure cron service is enable
+
+```bash
+sudo systemctl enable cron
+```
+
+
 ## Web Part <a id="WebPart"></a>
 1. Generate a new SSL key, enter the info when requested.:
 ```bash
@@ -169,15 +362,15 @@ vim /etc/apache2/sites-available/001-default.conf
 Change the ServerName by whatever you want and the DocumentRoot by the path to your website.
 Activate the new configuration:
 
-# Disables the old configuration
+6. Disables the old configuration
 ```bash
 a2dissite 000-default.conf
 ```
-# Active new
+7. Active new
 ```bash
 a2ensite 001-site.conf
 ```
-# The command speaks for itself ...
+8. The command speaks for itself ...
 ```bash
 systemctl reload apache2
 ```
