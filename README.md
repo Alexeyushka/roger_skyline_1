@@ -112,7 +112,7 @@ sudo service ssh restart
 ## Web Part <a id="WebPart"></a>
 1. Generate a new SSL key, enter the info when requested.:
 ```bash
-sudo openssl req -x509 -nodes -days 365 -new keys: 2048 -keyout /etc/ssl/private/roger-skyline.com.key -out /etc/ssl/certs/roger-skyline.com.crt
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -subj "/C=FR/ST=IDF/O=42/OU=Project-roger/CN=10.11.200.247" -keyout /etc/ssl/private/roger-skyline.com.key -out /etc/ssl/certs/roger-skyline.com.crt
 ```
 
 2. Then
