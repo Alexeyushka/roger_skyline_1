@@ -123,7 +123,7 @@ sudo ufw status
  ```
  
 2. Setup firewall rules
-      - SSH : `sudo ufw allow 50683/tcp`
+      - SSH : `sudo ufw allow 2222/tcp`
       - HTTP : `sudo ufw allow 80/tcp`
       - HTTPS : `sudo ufw allow 443`
       
@@ -250,11 +250,11 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 1. Create the `cronMonitor.sh` file and write the following lines inside
 
 ```console
-gde@roger-skyline-1:~$ cat ~/cronMonitor.sh
+cat ~/cronMonitor.sh
 #!/bin/bash
 
 FILE="/var/tmp/checksum"
-FILE_TO_WATCH="/var/spool/cron/crontabs/gde"
+FILE_TO_WATCH="/var/spool/cron/crontabs/newuser"
 MD5VALUE=$(sudo md5sum $FILE_TO_WATCH)
 
 if [ ! -f $FILE ]
@@ -292,7 +292,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 ```bash
 sudo chmod 755 cronMonitor.sh
 sudo chmod 755 update.sh
-sudo chown newuser /var/mail/newuser
+sudo chown jmartyn- /var/mail/jmartyn-
 ```
 
 5. make sure cron service is enable
